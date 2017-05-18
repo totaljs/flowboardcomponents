@@ -4,5 +4,5 @@ This component is dynamic component and it read a value from Flow component `flo
 
 ## Installation
 
-- install first `flowboardlight.js` into your Total.js Flow
+- install first [`flowboardlight.js`](https://github.com/totaljs/flowcomponents/tree/master/flowboardlight) into your Total.js Flow
 - then install `light.html` into your Flowboard
