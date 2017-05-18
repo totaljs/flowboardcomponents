@@ -1,0 +1,4 @@
+[
+	{"name":"Common","items":["design", "label", "output"]},
+	{"name":"IoT","items":["light", "socket"]}
+]
