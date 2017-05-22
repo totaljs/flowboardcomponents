@@ -1,4 +1,4 @@
 [
-	{"name":"Common","items":["design", "label", "output"]},
-	{"name":"IoT","items":["light", "socket"]}
+	{"name":"Common","items":["https://rawgit.com/totaljs/flowboardcomponents/master/design/design.html", "https://rawgit.com/totaljs/flowboardcomponents/master/label/label.html", "https://rawgit.com/totaljs/flowboardcomponents/master/output/output.html"]},
+	{"name":"IoT","items":["https://rawgit.com/totaljs/flowboardcomponents/master/light/light.html", "https://rawgit.com/totaljs/flowboardcomponents/master/socket/socket.html"]}
 ]
