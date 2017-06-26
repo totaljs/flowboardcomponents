@@ -33,12 +33,11 @@ exports.install = function(instance) {
 
 	instance.element.addClass('fb-light');
 	instance.on('data', function(response) {
-		if (response.id !== instance.options.id)
-			return;
-		state = response.body;
-		instance.switch();
+		if (response.id === instance.options.id && response.type === 'laststate') {
+			state = response.body;
+			instance.switch();
+		}
 	});
-
 
 	instance.on('options', function(options) {
 		var css = { width: options.width + 'px', height: options.height + 'px' };
@@ -50,6 +49,7 @@ exports.install = function(instance) {
 
 		css['font-size'] = (options.width / 2)+ 'px';
 		instance.element.find('.click').css(css);
+		options.id && instance.send(options.id, 'laststate');
 	});
 
 	instance.switch = function() {
@@ -57,7 +57,7 @@ exports.install = function(instance) {
 	};
 
 	instance.event('click touchend', '.click', function() {
-		!common.draft && instance.options.id && instance.send(instance.options.id, { value: state ? 0 : 1 });
+		!common.draft && instance.options.id && instance.send(instance.options.id, 'switch', { value: state ? 0 : 1 });
 	});
 
 	instance.on('resize', function(element, width, height, rotation) {
@@ -67,8 +67,8 @@ exports.install = function(instance) {
 		instance.element.find('.click').css('font-size', (width / 2) + 'px');
 	});
 
-	instance.emit('options', instance.options);
-	instance.switch();
+	instance.make = function() {
+		instance.emit('options', instance.options);
+	};
 };
-
 </script>

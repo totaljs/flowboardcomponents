@@ -28,14 +28,19 @@ exports.version = '1.0.0';
 exports.install = function(instance) {
 
 	instance.element.addClass('fb-output');
+
 	instance.on('data', function(response) {
-		response.id === instance.options.id && instance.element.html(response.body);
+		if (response.id === instance.options.id && response.type === 'laststate')
+		 	instance.html(response.body);
 	});
 
 	instance.on('options', function(options) {
-		options.size && instance.element.css('font-size', options.size + 'px');
+		options.size && instance.css('font-size', options.size + 'px');
+		options.id && instance.send(options.id, 'laststate');
 	});
 
-	instance.emit('options', instance.options);
+	instance.make = function() {
+		instance.emit('options', instance.options);
+	};
 };
 </script>
