@@ -27,10 +27,14 @@ exports.install = function(instance) {
 
 	instance.element.addClass('fb-socket');
 	instance.on('data', function(response) {
-		if (response.id !== instance.options.id)
-			return;
-		state = response.body;
-		instance.switch();
+		if (response.id === instance.options.id && response.type === 'laststate') {
+			state = response.body;
+			instance.switch();
+		}
+	});
+
+	instance.on('options', function(options) {
+		options.id && instance.send(options.id, 'laststate');
 	});
 
 	instance.switch = function() {
@@ -38,9 +42,11 @@ exports.install = function(instance) {
 	};
 
 	instance.event('click touchend', '.click', function() {
-		!common.draft && instance.options.id && instance.send(instance.options.id, { value: state ? 0 : 1 });
+		!common.draft && instance.options.id && instance.send(instance.options.id, 'switch', { value: state ? 0 : 1 });
 	});
 
-	instance.switch();
+	instance.make = function() {
+		instance.emit('options', instance.options);
+	};
 };
 </script>
