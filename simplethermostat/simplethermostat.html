@@ -1,0 +1,100 @@
+<script type="text/html" settings>
+<div class="padding npb">
+	<div class="m" data-jc="dropdown" data-jc-path="id" data-required="true" data-source="common.instances" data-source-condition="n => n.component === 'flowboardsimplethermostat'" data-empty="">@(Flow instance)</div>
+</div>
+</script>
+
+<script type="text/html" body>
+	<div class="resizable">
+		<div class="fb-st-value">...</div>
+		<div>			
+			<div class="fb-st-btn plus click"><i class="fa fa-plus"></i></div>
+			<div class="fb-st-btn minus click"><i class="fa fa-minus"></i></div>
+		</div>
+	</div>
+</script>
+
+<style type="text/css">
+	.fb-simplethermostat > div { transition: all 0.5s; font-size: 24px; color: #c1c1c1; width: 60px; height: 40px; border-radius: 4px; background-color: rgba(0,0,0,0.58); cursor: default; }
+	.draft .fb-simplethermostat > div { border: 2px solid red; }
+	.draft .fb-simplethermostat.selected > div { border-color: yellow; }
+	.fb-simplethermostat .resizable { display: table; }
+	.fb-simplethermostat .resizable > div { display: table-cell; vertical-align: middle; text-align: center; }
+	.fb-simplethermostat .on { background: radial-gradient(ellipse at center, rgba(255,234,0,1) 0%, #FFCE54 100%); color: #F6BB42 !important; }
+	.fb-simplethermostat .fb-st-value { padding-left: 8px; padding-right: 8px; }
+	.fb-simplethermostat .fb-st-btn { background-color: rgba(64, 64, 64, 0.5); padding-left: 5px; padding-right: 5px; vertical-align: middle; text-align: center; }
+	.fb-simplethermostat .fb-st-btn.minus { height: 50%; border-top-right-radius: 4px; cursor: pointer; }
+	.fb-simplethermostat .fb-st-btn.plus { height: 50%; border-bottom-right-radius: 4px; cursor: pointer; }
+	.fb-simplethermostat .fb-st-btn.minus:hover { color: lightgray; }
+	.fb-simplethermostat .fb-st-btn.plus:hover { color: lightgray; }
+</style>
+
+<script>
+exports.name = 'simplethermostat';
+exports.title = 'Simple thermostat';
+exports.icon = 'thermometer-half';
+exports.author = 'Martin Smola';
+exports.group = 'Common';
+exports.version = '1.0.0';
+exports.options = { width: 120, height: 50, rotation: 0 };
+exports.install = function(instance) {
+
+	var state = { value: 21, hysteresis: 0.5};
+
+	instance.element.addClass('fb-simplethermostat');
+	instance.on('data', function(response) {
+		if (response.id === instance.options.id && response.type === 'options') {
+			state = response.body;
+			instance.element.find('.fb-st-value').html(state.value + '&#8451;');
+		}
+	});
+
+	instance.on('options', function(options) {
+		var css = { width: options.width + 'px', height: options.height + 'px' };
+
+		if (options.rotation)
+			css.transform = 'rotate(' + options.rotation + 'deg)';
+		else
+			css.transform = 'inherit';
+
+		css['font-size'] = (options.width / 4) + 'px';
+		instance.element.find('.fb-st-value').css(css);
+		instance.element.find('.fb-st-btn').css('font-size', (options.width / 8) + 'px');
+		options.id && instance.send(options.id, 'getoptions');
+	});
+
+	instance.switch = function() {
+		instance.options.id && instance.find('.click').toggleClass('on', state === 1);
+	};
+
+	instance.event('click touchend', '.click', function() {
+		//!common.draft && instance.options.id && instance.send(instance.options.id, 'switch', { value: state ? 0 : 1 });
+		if (common.draft)
+			return;
+
+		var $btn = $(this);
+		if ($btn.hasClass('plus')) {
+
+			state.value++;
+			instance.send(instance.options.id, 'setoptions', state);
+
+		} else if ($btn.hasClass('minus')) {
+
+			state.value--;
+			instance.send(instance.options.id, 'setoptions', state);
+		}
+	});
+
+	instance.on('resize', function(element, width, height, rotation) {
+		instance.options.width = width;
+		instance.options.height = height;
+		instance.options.rotation = rotation;
+		instance.element.find('.fb-st-value').css('font-size', (width / 4) + 'px');
+		instance.element.find('.fb-st-btn').css('font-size', (width / 8) + 'px');
+	});
+
+	instance.make = function() {
+		instance.emit('options', instance.options);
+	};
+};
+</script>
