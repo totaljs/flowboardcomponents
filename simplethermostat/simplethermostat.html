@@ -1,13 +1,13 @@
 <script type="text/html" settings>
 <div class="padding npb">
-	<div class="m" data-jc="dropdown" data-jc-path="id" data-required="true" data-source="common.instances" data-source-condition="n => n.component === 'flowboardsimplethermostat'" data-empty="">@(Flow instance)</div>
+	<div class="m" data-jc="dropdown" data-jc-path="id" data-jc-config="datasource:common.instances;empty:;required:true;condition:n => n.component === 'flowboardsimplethermostat'">@(Flow instance)</div>
 </div>
 </script>
 
 <script type="text/html" body>
 	<div class="resizable">
 		<div class="fb-st-value">...</div>
-		<div>			
+		<div>
 			<div class="fb-st-btn plus click"><i class="fa fa-plus"></i></div>
 			<div class="fb-st-btn minus click"><i class="fa fa-minus"></i></div>
 		</div>
