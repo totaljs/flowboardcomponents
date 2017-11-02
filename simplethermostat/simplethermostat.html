@@ -6,27 +6,37 @@
 
 <script type="text/html" body>
 	<div class="resizable">
-		<div class="fb-st-value">...</div>
-		<div>
-			<div class="fb-st-btn plus click"><i class="fa fa-plus"></i></div>
-			<div class="fb-st-btn minus click"><i class="fa fa-minus"></i></div>
-		</div>
+		<svg viewBox="0 0 100 100">
+			<g class="box" transform="scale(1,1)">	
+				<rect class="fillbox" style="stroke-width:.913;fill-opacity:.95;transition:fill 1s;" rx="3" ry="3.01" height="100" width="100" y="0" x="0"/>
+				<text class="name" style="letter-spacing:0px;font-size:10px;word-spacing:0px;font-family:sans-serif;line-height:1.25;fill:white" y="14" x="50" text-anchor="middle"></text>
+				<text class="set" style="letter-spacing:0px;font-size:12px;word-spacing:0px;font-family:sans-serif;font-weight: bold;line-height:1.25;fill:white" y="68" x="26" text-anchor="middle">MODE</text>
+				<text class="temp_current" text-anchor="middle" style="letter-spacing:0px;font-size:37.7px;font-weight: bold;word-spacing:0px;font-family:sans-serif;line-height:1.25;fill:white" y="48" x="50">21.0</text>
+				<text class="temp_required" text-anchor="middle" style="letter-spacing:0px;font-size:18.1px;font-weight: bold;word-spacing:0px;font-family:sans-serif;line-height:1.25;fill:white" y="70" x="73">21.0</text>
+				<rect class="minus click" style="stroke-width:1.5;fill-opacity:0;stroke:white;" rx="3.28" ry="3.01" height="15.2" width="42.3" y="77" x="4.89"/>
+				<rect class="plus click" style="stroke-width:1.5;fill-opacity:0;stroke:white;" rx="3.28" ry="3.01" height="15.2" width="42.3" y="77" x="52.9"/>
+				<rect class="minus click" style="stroke-width:.705;fill:white;" height="3.41" width="11.7" y="83" x="20"/>
+				<path class="plus click" style="stroke-width:.705;fill:white;" d="m72.4 79v4.16h-4.15v3.4h4.15v4.16h3.39v-4.16h4.15v-3.4h-4.15v-4.16z"/>
+			</g>
+		</svg>
 	</div>
 </script>
 
 <style type="text/css">
-	.fb-simplethermostat > div { transition: all 0.5s; font-size: 24px; color: #c1c1c1; width: 60px; height: 40px; border-radius: 4px; background-color: rgba(0,0,0,0.58); cursor: default; }
+	.fb-simplethermostat svg {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+	.fb-simplethermostat svg .click{
+		cursor: pointer;
+	}
+	.fb-simplethermostat > div { transition: all 0.5s; font-size: 24px; color: #fff; width: 120px; height: 120px; border-radius: 4px;  cursor: default; }
 	.draft .fb-simplethermostat > div { border: 2px solid red; }
 	.draft .fb-simplethermostat.selected > div { border-color: yellow; }
 	.fb-simplethermostat .resizable { display: table; }
 	.fb-simplethermostat .resizable > div { display: table-cell; vertical-align: middle; text-align: center; }
-	.fb-simplethermostat .on { background: radial-gradient(ellipse at center, rgba(255,234,0,1) 0%, #FFCE54 100%); color: #F6BB42 !important; }
-	.fb-simplethermostat .fb-st-value { padding-left: 8px; padding-right: 8px; }
-	.fb-simplethermostat .fb-st-btn { background-color: rgba(64, 64, 64, 0.5); padding-left: 5px; padding-right: 5px; vertical-align: middle; text-align: center; }
-	.fb-simplethermostat .fb-st-btn.minus { height: 50%; border-top-right-radius: 4px; cursor: pointer; }
-	.fb-simplethermostat .fb-st-btn.plus { height: 50%; border-bottom-right-radius: 4px; cursor: pointer; }
-	.fb-simplethermostat .fb-st-btn.minus:hover { color: lightgray; }
-	.fb-simplethermostat .fb-st-btn.plus:hover { color: lightgray; }
+
 </style>
 
 <script>
@@ -36,30 +46,36 @@ exports.icon = 'thermometer-half';
 exports.author = 'Martin Smola';
 exports.group = 'Common';
 exports.version = '1.0.0';
-exports.options = { width: 120, height: 50, rotation: 0 };
+exports.options = { width: 120, height: 120, rotation: 0 };
 exports.install = function(instance) {
 
-	var state = { value: 21, hysteresis: 0.5};
+	var state = { temp_current: 21, hysteresis: 0.5, temp_required: 21 };
 
 	instance.element.addClass('fb-simplethermostat');
-	instance.on('data', function(response) {
-		if (response.id === instance.options.id && response.type === 'options') {
-			state = response.body;
-			instance.element.find('.fb-st-value').html(state.value + '&#8451;');
+
+	instance.on('data', function(data) {
+
+		if (data.id !== instance.options.id)
+			return;
+
+		if (data.type === 'options') {
+			state = data.body;
+			instance.element.find('.fillbox').attr('fill', state.enabled ? state.heating ? '#ff3939' : 'grey' : '#00bfff');
+			instance.element.find('.temp_required').text(state['temp_heating_' + state.mode].toFixed(1));
+			instance.element.find('.temp_current').text(state.temp_current.toFixed(1));
+			instance.element.find('.name').text(state.name);
+			instance.element.find('.set').text(state.mode.toUpperCase());
 		}
 	});
 
 	instance.on('options', function(options) {
-		var css = { width: options.width + 'px', height: options.height + 'px' };
+		var css = { };//width: options.width + 'px', height: options.height + 'px' };
 
 		if (options.rotation)
 			css.transform = 'rotate(' + options.rotation + 'deg)';
 		else
 			css.transform = 'inherit';
 
-		css['font-size'] = (options.width / 4) + 'px';
-		instance.element.find('.fb-st-value').css(css);
-		instance.element.find('.fb-st-btn').css('font-size', (options.width / 8) + 'px');
 		options.id && instance.send(options.id, 'getoptions');
 	});
 
@@ -68,19 +84,17 @@ exports.install = function(instance) {
 	};
 
 	instance.event('click touchend', '.click', function() {
-		//!common.draft && instance.options.id && instance.send(instance.options.id, 'switch', { value: state ? 0 : 1 });
+
 		if (common.draft)
 			return;
 
 		var $btn = $(this);
 		if ($btn.hasClass('plus')) {
-
-			state.value++;
+			state['temp_heating_' + state.mode] += 0.5;
 			instance.send(instance.options.id, 'setoptions', state);
 
 		} else if ($btn.hasClass('minus')) {
-
-			state.value--;
+			state['temp_heating_' + state.mode] -= 0.5;
 			instance.send(instance.options.id, 'setoptions', state);
 		}
 	});
@@ -89,8 +103,9 @@ exports.install = function(instance) {
 		instance.options.width = width;
 		instance.options.height = height;
 		instance.options.rotation = rotation;
-		instance.element.find('.fb-st-value').css('font-size', (width / 4) + 'px');
-		instance.element.find('.fb-st-btn').css('font-size', (width / 8) + 'px');
+
+		instance.element.find('svg').attr('viewBox', '0 0 {0} {1}'.format(width, height));
+		instance.element.find('.box').attr('transform', 'scale({0},{1})'.format(width/100, height/100));
 	});
 
 	instance.make = function() {
