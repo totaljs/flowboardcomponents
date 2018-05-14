@@ -57,7 +57,7 @@ exports.install = function(instance) {
 	};
 
 	instance.event('click touchend', '.click', function() {
-		!common.draft && instance.options.id && instance.send(instance.options.id, 'switch', { value: state ? 0 : 1 });
+		!common.draft && instance.options.id && instance.send(instance.options.id, 'switch', state ? 0 : 1);
 	});
 
 	instance.on('resize', function(element, width, height, rotation) {
