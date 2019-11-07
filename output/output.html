@@ -1,9 +1,9 @@
 <script type="text/html" settings>
 	<div class="padding">
-		<div class="m" data-jc="dropdown" data-jc-path="id" data-required="true" data-source="common.instances" data-source-condition="n => n.component === 'flowboardoutput'" data-empty="">@(Flow instance)</div>
+		<div class="m" data-jc="dropdown__id__required:true;datasource:common.instances;empty:;if:n => n.component === 'flowboardoutput'">@(Flow instance)</div>
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data-jc="textbox" data-jc-path="size" data-required="true" data-jc-type="number" data-increment="true" data-align="center">@(Size of font)</div>
+				<div data-jc="textbox__size__required:true;$type:number;increment:true;align:center">@(Size of font)</div>
 			</div>
 		</div>
 	</div>
